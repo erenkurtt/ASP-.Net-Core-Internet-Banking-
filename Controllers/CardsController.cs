@@ -46,6 +46,34 @@ namespace Internship.Controllers
             return new JsonResult(table);
         }
 
+        [HttpGet("privCard/{bank_id}")]
+        public JsonResult Get(int bank_id)
+        {
+            string query = @"
+                select * from dbo.cards
+                    where bank_id=@bank_id
+                ";
+
+            DataTable table = new DataTable();
+            string sqlDataSource = _configuration.GetConnectionString("Internship");
+            SqlDataReader myReader;
+            using (SqlConnection myCon = new SqlConnection(sqlDataSource))
+            {
+                myCon.Open();
+                using (SqlCommand myCommand = new SqlCommand(query, myCon))
+                {
+                    myCommand.Parameters.AddWithValue("@bank_id", bank_id);
+                    myReader = myCommand.ExecuteReader();
+                    table.Load(myReader);
+                    myReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            return new JsonResult(table);
+        }
+
+
         [HttpGet("{card_no}")]
         public JsonResult Get(string card_no)
         {
